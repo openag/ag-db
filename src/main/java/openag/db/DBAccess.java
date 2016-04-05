@@ -65,8 +65,12 @@ public class DBAccess {
 
   private Connection connection() throws SQLException {
     if (this.connection == null) {
-      //todo: load data type definitions here, use getTypeInfo()
-      this.connection = DriverManager.getConnection(url, user, password);
+      final Connection c = DriverManager.getConnection(url, user, password);
+
+      final List<DBType> types = DBUtil.getTypes(c);
+      //todo: implement
+
+      this.connection = c;
     }
     return this.connection;
   }

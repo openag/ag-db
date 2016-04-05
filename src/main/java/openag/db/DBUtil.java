@@ -89,6 +89,29 @@ public class DBUtil {
     }
   }
 
+  /**
+   * List of SQL types supported by the database
+   */
+  public static List<DBType> getTypes(Connection connection) throws SQLException {
+    assertNotNull(connection);
+
+    ResultSet rs = null;
+    try {
+      rs = connection.getMetaData().getTypeInfo();
+
+      final List<DBType> types = new LinkedList<>();
+      while (rs.next()) {
+        final DBType type = new DBType();
+        type.setName(rs.getString("TYPE_NAME"));
+        type.setSqlType(rs.getInt("DATA_TYPE"));
+        types.add(type);
+      }
+      return types;
+    } finally {
+      closeQuietly(rs);
+    }
+  }
+
 
   /**
    * todo:
