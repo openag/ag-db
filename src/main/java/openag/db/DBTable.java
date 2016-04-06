@@ -1,7 +1,7 @@
 package openag.db;
 
 /**
- * TODO: add comment
+ * Database table metadata container
  * <p>
  *
  * @author Andrei Maus

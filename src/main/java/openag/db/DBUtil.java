@@ -90,6 +90,20 @@ public class DBUtil {
   }
 
   /**
+   * Executes provided sql string
+   */
+  public static boolean execute(Connection connection, String sql) throws SQLException {
+    PreparedStatement statement = null;
+    try {
+      statement = connection.prepareStatement(sql);
+      return statement.execute();
+    } finally {
+      closeQuietly(statement);
+    }
+  }
+
+
+  /**
    * List of SQL types supported by the database
    */
   public static List<DBType> getTypes(Connection connection) throws SQLException {
