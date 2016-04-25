@@ -1,4 +1,4 @@
-package openag.db;
+package openag.db.meta;
 
 import java.util.ArrayList;
 

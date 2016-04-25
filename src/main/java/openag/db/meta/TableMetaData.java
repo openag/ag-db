@@ -1,4 +1,4 @@
-package openag.db;
+package openag.db.meta;
 
 /**
  * Database table metadata container
@@ -6,7 +6,7 @@ package openag.db;
  *
  * @author Andrei Maus
  */
-public class DBTable {
+public class TableMetaData {
 
   /* table catalog (may be null) */
   private String catalog;
@@ -41,37 +41,34 @@ public class DBTable {
     return comment;
   }
 
-  void setCatalog(final String catalog) {
+  public void setCatalog(final String catalog) {
     this.catalog = catalog;
   }
 
-  void setSchema(final String schema) {
+  public void setSchema(final String schema) {
     this.schema = schema;
   }
 
-  void setName(final String name) {
+  public void setName(final String name) {
     this.name = name;
   }
 
-  void setType(final TableType type) {
+  public void setType(final TableType type) {
     this.type = type;
   }
 
-  void setComment(final String comment) {
+  public void setComment(final String comment) {
     this.comment = comment;
   }
 
   @Override
   public String toString() {
-    return "DBTable{" +
+    return "TableMetaData{" +
         "catalog='" + catalog + '\'' +
         ", schema='" + schema + '\'' +
         ", name='" + name + '\'' +
         ", type=" + type +
         ", comment='" + comment + '\'' +
         '}';
-  }
-
-  DBTable() {
   }
 }

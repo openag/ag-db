@@ -1,5 +1,9 @@
 package openag.db;
 
+import openag.db.meta.ColumnMetaData;
+import openag.db.meta.TableMetaData;
+import openag.db.meta.TableType;
+
 import javax.sql.DataSource;
 import java.io.PrintStream;
 import java.sql.*;
@@ -130,11 +134,11 @@ public class DBUtil {
   /**
    * todo:
    */
-  public static List<DBTable> getTables(Connection connection,
-                                        String catalog,
-                                        String schemaPattern,
-                                        String tableNamePattern,
-                                        TableType... types) throws SQLException {
+  public static List<TableMetaData> getTables(Connection connection,
+                                              String catalog,
+                                              String schemaPattern,
+                                              String tableNamePattern,
+                                              TableType... types) throws SQLException {
     assertNotNull(connection);
 
     ResultSet rs = null;
@@ -142,9 +146,9 @@ public class DBUtil {
       rs = connection.getMetaData().getTables(catalog, schemaPattern, tableNamePattern,
           TableType.toValues(types));
 
-      final List<DBTable> tables = new LinkedList<>();
+      final List<TableMetaData> tables = new LinkedList<>();
       while (rs.next()) {
-        final DBTable table = new DBTable();
+        final TableMetaData table = new TableMetaData();
         table.setCatalog(rs.getString("TABLE_CAT"));
         table.setSchema(rs.getString("TABLE_SCHEM"));
         table.setName(rs.getString("TABLE_NAME"));
@@ -162,18 +166,18 @@ public class DBUtil {
   /**
    * Returns column metadata for the specified table
    */
-  public static List<DBColumn> getColumns(Connection connection,
-                                          String catalog,
-                                          String schemaPattern,
-                                          String tableNamePattern,
-                                          String columnNamePattern) throws SQLException {
+  public static List<ColumnMetaData> getColumns(Connection connection,
+                                                String catalog,
+                                                String schemaPattern,
+                                                String tableNamePattern,
+                                                String columnNamePattern) throws SQLException {
     ResultSet rs = null;
 
-    final List<DBColumn> result = new LinkedList<>();
+    final List<ColumnMetaData> result = new LinkedList<>();
     try {
       rs = connection.getMetaData().getColumns(catalog, schemaPattern, tableNamePattern, columnNamePattern);
       while (rs.next()) {
-        final DBColumn c = new DBColumn();
+        final ColumnMetaData c = new ColumnMetaData();
         c.setCatalog(rs.getString("TABLE_CAT"));
         c.setSchema(rs.getString("TABLE_SCHEM"));
         c.setTable(rs.getString("TABLE_NAME"));

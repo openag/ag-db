@@ -1,12 +1,14 @@
-package openag.db;
+package openag.db.meta;
 
+
+import openag.db.ThreeState;
 
 /**
  * Database single table column metadata container
  *
  * @author Andrei Maus
  */
-public class DBColumn {
+public class ColumnMetaData {
 
   /* table catalog (may be null) */
   private String catalog;
@@ -104,65 +106,65 @@ public class DBColumn {
     return autoincrement;
   }
 
-  void setCatalog(String catalog) {
+  public void setCatalog(final String catalog) {
     this.catalog = catalog;
   }
 
-  void setSchema(String schema) {
+  public void setSchema(final String schema) {
     this.schema = schema;
   }
 
-  void setTable(String table) {
+  public void setTable(final String table) {
     this.table = table;
   }
 
-  void setName(String name) {
+  public void setName(final String name) {
     this.name = name;
   }
 
-  void setType(int type) {
+  public void setType(final int type) {
     this.type = type;
   }
 
-  void setTypeName(String typeName) {
+  public void setTypeName(final String typeName) {
     this.typeName = typeName;
   }
 
-  void setSize(int size) {
+  public void setSize(final int size) {
     this.size = size;
   }
 
-  void setDecimals(int decimals) {
+  public void setDecimals(final int decimals) {
     this.decimals = decimals;
   }
 
-  void setComment(String comment) {
+  public void setComment(final String comment) {
     this.comment = comment;
   }
 
-  void setDefaultValue(String defaultValue) {
+  public void setDefaultValue(final String defaultValue) {
     this.defaultValue = defaultValue;
   }
 
-  void setCharSize(int charSize) {
+  public void setCharSize(final int charSize) {
     this.charSize = charSize;
   }
 
-  void setOrdinal(int ordinal) {
+  public void setOrdinal(final int ordinal) {
     this.ordinal = ordinal;
   }
 
-  void setNullable(ThreeState nullable) {
+  public void setNullable(final ThreeState nullable) {
     this.nullable = nullable;
   }
 
-  void setAutoincrement(ThreeState autoincrement) {
+  public void setAutoincrement(final ThreeState autoincrement) {
     this.autoincrement = autoincrement;
   }
 
   @Override
   public String toString() {
-    return "DBColumn{" +
+    return "ColumnMetaData{" +
         "catalog='" + catalog + '\'' +
         ", schema='" + schema + '\'' +
         ", table='" + table + '\'' +
@@ -178,8 +180,5 @@ public class DBColumn {
         ", nullable=" + nullable +
         ", autoincrement=" + autoincrement +
         '}';
-  }
-
-  DBColumn() {
   }
 }
