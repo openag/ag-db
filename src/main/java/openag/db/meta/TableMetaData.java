@@ -21,6 +21,17 @@ public class TableMetaData {
 
   private String comment;
 
+  public TableMetaData() {
+  }
+
+  public TableMetaData(TableMetaData copy) {
+    this.catalog = copy.catalog;
+    this.schema = copy.schema;
+    this.name = copy.name;
+    this.type = copy.type;
+    this.comment = copy.comment;
+  }
+
   public String getCatalog() {
     return catalog;
   }

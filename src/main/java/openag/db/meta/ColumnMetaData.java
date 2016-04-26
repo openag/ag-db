@@ -50,6 +50,26 @@ public class ColumnMetaData {
 
   private ThreeState autoincrement;
 
+  public ColumnMetaData() {
+  }
+
+  public ColumnMetaData(ColumnMetaData copy) {
+    this.catalog = copy.catalog;
+    this.schema = copy.schema;
+    this.table = copy.table;
+    this.name = copy.name;
+    this.type = copy.type;
+    this.typeName = copy.typeName;
+    this.size = copy.size;
+    this.decimals = copy.decimals;
+    this.comment = copy.comment;
+    this.defaultValue = copy.defaultValue;
+    this.charSize = copy.charSize;
+    this.ordinal = copy.ordinal;
+    this.nullable = copy.nullable;
+    this.autoincrement = copy.autoincrement;
+  }
+
   public String getCatalog() {
     return catalog;
   }

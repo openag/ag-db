@@ -368,10 +368,6 @@ public class DBUtil {
     }
   }
 
-  public static interface ConnectionCallback<R> {
-    R exec(Connection connection) throws SQLException;
-  }
-
   private DBUtil() {
   }
 }
