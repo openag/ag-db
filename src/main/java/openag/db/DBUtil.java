@@ -39,17 +39,6 @@ public class DBUtil {
   }
 
   /**
-   * Detects database type indicated by the provided datasource;
-   *
-   * @param dataSource {@link DataSource} instance
-   * @return {@link DatabaseType} instance; never NULL
-   * @throws SQLException
-   */
-  public static DatabaseType detectType(DataSource dataSource) throws SQLException {
-    return withConnection(dataSource, DBUtil::detectType);
-  }
-
-  /**
    * Closes provided {@link ResultSet} without throwing exception
    *
    * @param rs {@link ResultSet} to close
@@ -95,6 +84,20 @@ public class DBUtil {
   }
 
   /**
+   * Wraps provided {@link ResultSet} into {@link Iterator} instance.
+   */
+  public static Iterator<ResultSet> asIterator(ResultSet rs) {
+    return new ResultSetIterator(rs);
+  }
+
+  /**
+   * Wraps provided {@link ResultSet} into {@link Iterable} instance.
+   */
+  public static Iterable<ResultSet> asIterable(ResultSet rs) {
+    return new ResultSetIterable(rs);
+  }
+
+  /**
    * Executes provided sql string
    */
   public static boolean execute(Connection connection, String sql) throws SQLException {
@@ -106,7 +109,6 @@ public class DBUtil {
       closeQuietly(statement);
     }
   }
-
 
   /**
    * List of SQL types supported by the database
@@ -230,10 +232,6 @@ public class DBUtil {
     }
   }
 
-  public static List<String> getPrimaryKeyColumns(DataSource dataSource, final String schema, final String table) throws SQLException {
-    return withConnection(dataSource, connection -> getPrimaryKeyColumns(connection, schema, table));
-  }
-
   /**
    * Retrieves primary key index name (usually same as primary key constraint name) for the specified table
    *
@@ -332,10 +330,10 @@ public class DBUtil {
    * Fetching connection from provided datasource, run the callback on the connection and properly closes it in the end
    *
    * @param dataSource {@link DataSource} instance
-   * @param callback   {@link ConnectionCallback} instance
+   * @param callback   {@link Callback} instance
    * @return value returned from the callback
    */
-  public static <T> T withConnection(DataSource dataSource, ConnectionCallback<T> callback) throws SQLException {
+  public static <T> T withConnection(DataSource dataSource, Callback<Connection, T> callback) throws SQLException {
     assertNotNull(dataSource);
 
     Connection connection = null;
@@ -345,6 +343,19 @@ public class DBUtil {
     } finally {
       closeQuietly(connection);
     }
+  }
+
+  public static <T> T withPreparedStatement(DataSource dataSource, String sql,
+                                            Callback<PreparedStatement, T> callback) throws SQLException {
+    return withConnection(dataSource, connection -> {
+      PreparedStatement statement = null;
+      try {
+        statement = connection.prepareStatement(sql);
+        return callback.exec(statement);
+      } finally {
+        closeQuietly(statement);
+      }
+    });
   }
 
   /**
@@ -366,6 +377,19 @@ public class DBUtil {
   public static void assertNotNull(Connection connection) {
     if (connection == null) {
       throw new IllegalArgumentException("Provided connection instance is NULL, can't detect database type");
+    }
+  }
+
+  private static class ResultSetIterable implements Iterable<ResultSet> {
+    private final ResultSetIterator iterator;
+
+    public ResultSetIterable(final ResultSet rs) {
+      this.iterator = new ResultSetIterator(rs);
+    }
+
+    @Override
+    public Iterator<ResultSet> iterator() {
+      return iterator;
     }
   }
 

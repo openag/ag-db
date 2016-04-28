@@ -10,7 +10,7 @@ import java.util.Iterator;
  *
  * @author Andrei Maus
  */
-public class ResultSetIterator implements Iterator<ResultSet>, AutoCloseable {
+class ResultSetIterator implements Iterator<ResultSet>, AutoCloseable {
 
   private final ResultSet rs;
 
@@ -86,5 +86,9 @@ public class ResultSetIterator implements Iterator<ResultSet>, AutoCloseable {
     } catch (SQLException e) {
       //ignore
     }
+  }
+
+  public ResultSet getResultSet() {
+    return rs;
   }
 }
