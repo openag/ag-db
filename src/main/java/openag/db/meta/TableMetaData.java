@@ -2,9 +2,6 @@ package openag.db.meta;
 
 /**
  * Database table metadata container
- * <p>
- *
- * @author Andrei Maus
  */
 public class TableMetaData {
 

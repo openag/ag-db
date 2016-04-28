@@ -1,9 +1,6 @@
 package openag.db;
 
-import openag.db.meta.ColumnMetaData;
-import openag.db.meta.TableMetaData;
-import openag.db.meta.TableType;
-import openag.db.meta.TypeMetaData;
+import openag.db.meta.*;
 
 import javax.sql.DataSource;
 import java.io.PrintStream;
@@ -183,7 +180,7 @@ public class DBUtil {
         final ColumnMetaData c = new ColumnMetaData();
         c.setCatalog(rs.getString("TABLE_CAT"));
         c.setSchema(rs.getString("TABLE_SCHEM"));
-        c.setTable(rs.getString("TABLE_NAME"));
+        c.setTableName(rs.getString("TABLE_NAME"));
         c.setName(rs.getString("COLUMN_NAME"));
         c.setType(rs.getInt("DATA_TYPE"));
         c.setTypeName(rs.getString("TYPE_NAME"));
@@ -211,22 +208,33 @@ public class DBUtil {
   /**
    * Returns list of primary key columns for the specified table
    *
-   * @param table  target table name
-   * @param schema target schema name
+   * @param tableNamePattern target table name
+   * @param schemaPattern    target schema name
    * @return list of primary key column names; return empty list when table has no columns; never null
    */
-  public static List<String> getPrimaryKeyColumns(Connection connection, String schema, String table) throws SQLException {
+  public static List<PrimaryKeyMetaData> getPrimaryKeys(Connection connection,
+                                                        String catalog,
+                                                        String schemaPattern,
+                                                        String tableNamePattern) throws SQLException {
     assertNotNull(connection);
 
     ResultSet rs = null;
-    try {
-      rs = connection.getMetaData().getPrimaryKeys(null, schema, table);
 
-      final Map<Integer, String> columns = new TreeMap<>();
+    final List<PrimaryKeyMetaData> result = new ArrayList<>();
+    try {
+      rs = connection.getMetaData().getPrimaryKeys(catalog, schemaPattern, tableNamePattern);
+
       while (rs.next()) {
-        columns.put(rs.getInt("KEY_SEQ"), rs.getString("COLUMN_NAME")); //sort by position in PK constraint
+        final PrimaryKeyMetaData e = new PrimaryKeyMetaData();
+        e.setTableCatalog(rs.getString("TABLE_CAT"));
+        e.setTableSchema(rs.getString("TABLE_SCHEM"));
+        e.setTableName(rs.getString("TABLE_NAME"));
+        e.setColumnName(rs.getString("COLUMN_NAME"));
+        e.setSequence(rs.getInt("KEY_SEQ"));
+        e.setName(rs.getString("PK_NAME"));
+        result.add(e);
       }
-      return new ArrayList<>(columns.values());
+      return result;
     } finally {
       closeQuietly(rs);
     }

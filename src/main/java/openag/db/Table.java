@@ -3,14 +3,17 @@ package openag.db;
 import openag.db.meta.TableMetaData;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
- * TODO: add comment
+ * DB Table model
  */
 public class Table extends TableMetaData {
 
   private final List<Column> columns = new ArrayList<>();
+
+  private PrimaryKey primaryKey;
 
   public Table() {
   }
@@ -20,12 +23,29 @@ public class Table extends TableMetaData {
   }
 
   public List<Column> getColumns() {
-    return columns;
+    return Collections.unmodifiableList(columns);
   }
 
-  public void addColumn(Column column) { //todo: check for duplicates!
+  public PrimaryKey getPrimaryKey() {
+    return primaryKey;
+  }
+
+  public String getQualifiedName() {
+    if (getSchema() != null) {
+      return getSchema() + "." + getName();
+    }
+    return getName();
+  }
+
+  void addColumn(Column column) {
     this.columns.add(column);
   }
 
+  Column findColumn(String name) {
+    return this.columns.stream().filter(column -> column.getName().equals(name)).findFirst().get();
+  }
 
+  void setPrimaryKey(final PrimaryKey primaryKey) {
+    this.primaryKey = primaryKey;
+  }
 }

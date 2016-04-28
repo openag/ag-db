@@ -1,9 +1,6 @@
 package openag.db;
 
-import openag.db.meta.ColumnMetaData;
-import openag.db.meta.TableMetaData;
-import openag.db.meta.TableType;
-import openag.db.meta.TypeMetaData;
+import openag.db.meta.*;
 
 import javax.sql.DataSource;
 import java.io.Closeable;
@@ -13,6 +10,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -61,9 +59,27 @@ public abstract class Database implements Closeable {
         result.add(t);
 
         for (ColumnMetaData column : DBUtil.getColumns(connection, table.getCatalog(), table.getSchema(), table.getName(), null)) {
-          t.addColumn(new Column(column));
+          final Column c = new Column(column);
+          c.setTable(t);
+          t.addColumn(c);
         }
 
+        final List<PrimaryKeyMetaData> primaryKeys =
+            DBUtil.getPrimaryKeys(connection, table.getCatalog(), table.getSchema(), table.getName());
+
+        if (!primaryKeys.isEmpty()) {
+          final PrimaryKey pk = new PrimaryKey();
+          t.setPrimaryKey(pk);
+
+          Collections.sort(primaryKeys, (o1, o2) -> o1.getSequence() - o2.getSequence()); //todo:
+
+          pk.setName(primaryKeys.get(0).getName());
+          pk.setTable(t);
+
+          for (PrimaryKeyMetaData key : primaryKeys) {
+            pk.addColumn(t.findColumn(key.getColumnName()));
+          }
+        }
       }
 
       return result;
@@ -99,6 +115,24 @@ public abstract class Database implements Closeable {
 
     query.deleteCharAt(query.length() - 1);
     query.append(");");
+
+    withConnection(dataSource,
+        (CallbackWithoutResult<Connection>) connection -> execute(connection, query.toString()));
+
+    final PrimaryKey pk = table.getPrimaryKey();
+    if (pk != null) {
+      create(pk);
+    }
+  }
+
+  public void create(PrimaryKey pk) throws SQLException {
+    final StringBuilder query = new StringBuilder("alter table ")
+        .append(pk.getTable().getQualifiedName())
+        .append(" constraint ")
+        .append(pk.getName())
+        .append(" primary key (")
+        .append(String.join(",", pk.getColumnNames()))
+        .append(")");
 
     withConnection(dataSource,
         (CallbackWithoutResult<Connection>) connection -> execute(connection, query.toString()));

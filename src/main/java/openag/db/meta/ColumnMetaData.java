@@ -17,7 +17,7 @@ public class ColumnMetaData {
   private String schema;
 
   /* table name */
-  private String table;
+  private String tableName;
 
   /* column name */
   private String name;
@@ -56,7 +56,7 @@ public class ColumnMetaData {
   public ColumnMetaData(ColumnMetaData copy) {
     this.catalog = copy.catalog;
     this.schema = copy.schema;
-    this.table = copy.table;
+    this.tableName = copy.tableName;
     this.name = copy.name;
     this.type = copy.type;
     this.typeName = copy.typeName;
@@ -78,8 +78,8 @@ public class ColumnMetaData {
     return schema;
   }
 
-  public String getTable() {
-    return table;
+  public String getTableName() {
+    return tableName;
   }
 
   public String getName() {
@@ -134,8 +134,8 @@ public class ColumnMetaData {
     this.schema = schema;
   }
 
-  public void setTable(final String table) {
-    this.table = table;
+  public void setTableName(final String tableName) {
+    this.tableName = tableName;
   }
 
   public void setName(final String name) {
@@ -187,7 +187,7 @@ public class ColumnMetaData {
     return "ColumnMetaData{" +
         "catalog='" + catalog + '\'' +
         ", schema='" + schema + '\'' +
-        ", table='" + table + '\'' +
+        ", table='" + tableName + '\'' +
         ", name='" + name + '\'' +
         ", type=" + type +
         ", typeName='" + typeName + '\'' +

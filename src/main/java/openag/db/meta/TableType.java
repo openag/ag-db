@@ -4,9 +4,6 @@ import java.util.ArrayList;
 
 /**
  * Available table types (specific type availability depends on database implementation)
- * <p>
- *
- * @author Andrei Maus
  */
 public enum TableType {
 

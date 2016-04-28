@@ -3,9 +3,14 @@ package openag.db;
 import openag.db.meta.ColumnMetaData;
 
 /**
- * TODO: add comment
+ * Database Column model
  */
 public class Column extends ColumnMetaData {
+
+  /**
+   * Column owning table
+   */
+  private Table table;
 
   public Column() {
   }
@@ -14,4 +19,11 @@ public class Column extends ColumnMetaData {
     super(metaData);
   }
 
+  public Table getTable() {
+    return table;
+  }
+
+  void setTable(final Table table) {
+    this.table = table;
+  }
 }
