@@ -4,7 +4,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 /**
- * TODO: add comment
+ * Simple callback for {@link Connection}
  */
 public interface ConnectionCallback<R> {
   R exec(Connection connection) throws SQLException;

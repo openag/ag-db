@@ -3,6 +3,7 @@ package openag.db;
 import openag.db.meta.ColumnMetaData;
 import openag.db.meta.TableMetaData;
 import openag.db.meta.TableType;
+import openag.db.meta.TypeMetaData;
 
 import javax.sql.DataSource;
 import java.io.PrintStream;
@@ -110,16 +111,16 @@ public class DBUtil {
   /**
    * List of SQL types supported by the database
    */
-  public static List<DBType> getTypes(Connection connection) throws SQLException {
+  public static List<TypeMetaData> getTypes(Connection connection) throws SQLException {
     assertNotNull(connection);
 
     ResultSet rs = null;
     try {
       rs = connection.getMetaData().getTypeInfo();
 
-      final List<DBType> types = new LinkedList<>();
+      final List<TypeMetaData> types = new LinkedList<>();
       while (rs.next()) {
-        final DBType type = new DBType();
+        final TypeMetaData type = new TypeMetaData();
         type.setName(rs.getString("TYPE_NAME"));
         type.setSqlType(rs.getInt("DATA_TYPE"));
         types.add(type);
@@ -132,7 +133,7 @@ public class DBUtil {
 
 
   /**
-   * todo:
+   * List of table metadata for the specified schema/catalog/table pattern
    */
   public static List<TableMetaData> getTables(Connection connection,
                                               String catalog,

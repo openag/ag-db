@@ -1,6 +1,7 @@
 package openag.db;
 
 import openag.db.meta.ColumnMetaData;
+import openag.db.meta.TypeMetaData;
 import openag.db.meta.TableMetaData;
 import openag.db.meta.TableType;
 
@@ -25,7 +26,7 @@ public class DBAccess {
   private final String schema;
 
   private volatile Connection connection;
-  private List<DBType> types;
+  private List<TypeMetaData> types;
 
   public DBAccess(String url,
                   String user,
@@ -97,14 +98,14 @@ public class DBAccess {
   }
 
   private String toLocalDataType(final ColumnMetaData column) {
-    final Optional<DBType> nameMatch = this.types.stream()
+    final Optional<TypeMetaData> nameMatch = this.types.stream()
         .filter(dbType -> dbType.getName().equalsIgnoreCase(column.getTypeName())).findFirst();
 
     if (nameMatch.isPresent()) {
       return nameMatch.get().getName();
     }
 
-    final Optional<DBType> typeMatch = this.types.stream()
+    final Optional<TypeMetaData> typeMatch = this.types.stream()
         .filter(dbType -> dbType.getSqlType() == column.getType()).findFirst();
 
     if (typeMatch.isPresent()) {

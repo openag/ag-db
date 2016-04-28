@@ -3,13 +3,16 @@ package openag.db;
 import openag.db.meta.ColumnMetaData;
 import openag.db.meta.TableMetaData;
 import openag.db.meta.TableType;
+import openag.db.meta.TypeMetaData;
 
 import javax.sql.DataSource;
 import java.io.Closeable;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static openag.db.DBUtil.withConnection;
 
@@ -19,6 +22,11 @@ import static openag.db.DBUtil.withConnection;
 public class Database implements Closeable {
 
   private final DataSource dataSource;
+
+  /**
+   * DB Types supported by the current database
+   */
+  private final List<TypeMetaData> _types = new ArrayList<>();
 
   public Database(final DataSource dataSource) {
     this.dataSource = dataSource;
@@ -45,6 +53,68 @@ public class Database implements Closeable {
       return result;
     });
   }
+
+  public void create(Table table) throws SQLException {
+    withConnection(dataSource, connection -> {
+      final StringBuilder query = new StringBuilder("create table ");
+
+      if (table.getSchema() != null) {
+        query.append(table.getSchema()).append(".");
+      }
+
+      query.append(table.getName()).append(" (");
+
+      for (Column column : table.getColumns()) {
+        query.append(column.getName()).append(" ").append(toLocalDataType(column));
+        if (column.getSize() > 0 && columnSizeApplicable(column)) {
+          query.append("(").append(column.getSize());
+          if (column.getDecimals() > 0) {
+            query.append(",").append(column.getDecimals());
+          }
+          query.append(")");
+        }
+        query.append(",");
+      }
+
+      query.deleteCharAt(query.length() - 1);
+      query.append(");");
+
+      DBUtil.execute(connection, query.toString());
+    });
+  }
+
+  protected boolean columnSizeApplicable(final ColumnMetaData column) {
+    final int type = column.getType();
+    return type != Types.TIMESTAMP
+        && type != Types.FLOAT
+        && type != Types.CLOB;
+  }
+
+  private String toLocalDataType(final ColumnMetaData column) throws SQLException { //todo: provide better implementation
+    final Optional<TypeMetaData> nameMatch = types().stream()
+        .filter(dbType -> dbType.getName().equalsIgnoreCase(column.getTypeName())).findFirst();
+
+    if (nameMatch.isPresent()) {
+      return nameMatch.get().getName();
+    }
+
+    final Optional<TypeMetaData> typeMatch = this.types().stream()
+        .filter(dbType -> dbType.getSqlType() == column.getType()).findFirst();
+
+    if (typeMatch.isPresent()) {
+      return typeMatch.get().getName();
+    }
+
+    throw new IllegalStateException("Unable to find matching SQL type for column type: " + column.getTypeName());
+  }
+
+  protected final List<TypeMetaData> types() throws SQLException {
+    if (_types.isEmpty()) {
+      withConnection(dataSource, connection -> _types.addAll(DBUtil.getTypes(connection)));
+    }
+    return _types;
+  }
+
 
   @Override
   public void close() throws IOException {

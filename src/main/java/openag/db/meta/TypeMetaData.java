@@ -1,12 +1,9 @@
-package openag.db;
+package openag.db.meta;
 
 /**
- * TODO: add comment
- * <p>
- *
- * @author Andrei Maus
+ * Database data type metadata
  */
-public class DBType {
+public class TypeMetaData {
 
   private String name;
   private int sqlType;
