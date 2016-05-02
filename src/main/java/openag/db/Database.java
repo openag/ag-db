@@ -33,6 +33,14 @@ public abstract class Database implements Closeable {
    */
   public static Database create(DataSource dataSource) throws SQLException {
     final DatabaseType type = withConnection(dataSource, DBUtil::detectType);
+
+    final Database database = doCreate(dataSource, type);
+    database.init();
+
+    return database;
+  }
+
+  private static Database doCreate(final DataSource dataSource, final DatabaseType type) {
     switch (type) {
       case ORACLE:
         return new Oracle(dataSource);
@@ -48,6 +56,12 @@ public abstract class Database implements Closeable {
 
   private Database(final DataSource dataSource) {
     this.dataSource = dataSource;
+  }
+
+  /**
+   * Possibility to perform any general initialization routine; runs before any other activity
+   */
+  protected void init() throws SQLException {
   }
 
   public List<Table> getTables(TableFilter filter) throws SQLException {
@@ -102,7 +116,7 @@ public abstract class Database implements Closeable {
     query.append(table.getName()).append(" (");
 
     for (Column column : table.getColumns()) {
-      query.append(column.getName()).append(" ").append(toLocalDataType(column));
+      query.append(column.getName()).append(" ").append(toLocalDatabaseTypeName(column));
       if (column.getSize() > 0 && columnSizeApplicable(column)) {
         query.append("(").append(column.getSize());
         if (column.getDecimals() > 0) {
@@ -128,7 +142,7 @@ public abstract class Database implements Closeable {
   public void create(PrimaryKey pk) throws SQLException {
     final StringBuilder query = new StringBuilder("alter table ")
         .append(pk.getTable().getQualifiedName())
-        .append(" constraint ")
+        .append(" add constraint ")
         .append(pk.getName())
         .append(" primary key (")
         .append(String.join(",", pk.getColumnNames()))
@@ -145,19 +159,21 @@ public abstract class Database implements Closeable {
         && type != Types.CLOB;
   }
 
-  private String toLocalDataType(final ColumnMetaData column) throws SQLException { //todo: provide better implementation
+  /**
+   * Returns most suitable local database data type name for the provided column.
+   */
+  protected String toLocalDatabaseTypeName(final Column column) throws SQLException {
+    final Optional<TypeMetaData> typeMatch = this.types().stream()
+        .filter(dbType -> dbType.getSqlType() == column.getType()).findFirst();
+    if (typeMatch.isPresent()) {
+      return typeMatch.get().getName();
+    }
+
     final Optional<TypeMetaData> nameMatch = types().stream()
         .filter(dbType -> dbType.getName().equalsIgnoreCase(column.getTypeName())).findFirst();
 
     if (nameMatch.isPresent()) {
       return nameMatch.get().getName();
-    }
-
-    final Optional<TypeMetaData> typeMatch = this.types().stream()
-        .filter(dbType -> dbType.getSqlType() == column.getType()).findFirst();
-
-    if (typeMatch.isPresent()) {
-      return typeMatch.get().getName();
     }
 
     throw new IllegalStateException("Unable to find matching SQL type for column type: " + column.getTypeName());
@@ -222,6 +238,29 @@ public abstract class Database implements Closeable {
   private static class Hsqldb extends Database {
     private Hsqldb(final DataSource dataSource) {
       super(dataSource);
+    }
+
+    @Override
+    protected void init() throws SQLException {
+      withConnection(dataSource, (CallbackWithoutResult<Connection>) connection -> {
+
+        /* http://hsqldb.org/doc/guide/dbproperties-chapt.html
+         * Allow underscore and dollar sign in database object names for compatibility */
+        DBUtil.execute(connection, "SET DATABASE SQL REGULAR NAMES FALSE");
+      });
+    }
+
+    @Override
+    protected String toLocalDatabaseTypeName(final Column column) throws SQLException {
+      if ("NVARCHAR2".equals(column.getTypeName())) {
+        return "VARCHAR";
+      }
+
+      if ("NCLOB".equals(column.getTypeName())) {
+        return "CLOB";
+      }
+
+      return super.toLocalDatabaseTypeName(column);
     }
 
     @Override
