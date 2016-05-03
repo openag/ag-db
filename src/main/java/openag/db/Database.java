@@ -72,7 +72,7 @@ public abstract class Database implements Closeable {
         final Table t = new Table(table);
         result.add(t);
 
-        for (ColumnMetaData column : DBUtil.getColumns(connection, table.getCatalog(), table.getSchema(), table.getName(), null)) {
+        for (TableColumnMetaData column : DBUtil.getColumns(connection, table.getCatalog(), table.getSchema(), table.getName(), null)) {
           final Column c = new Column(column);
           c.setTable(t);
           t.addColumn(c);
@@ -152,7 +152,7 @@ public abstract class Database implements Closeable {
         (CallbackWithoutResult<Connection>) connection -> execute(connection, query.toString()));
   }
 
-  protected boolean columnSizeApplicable(final ColumnMetaData column) {
+  protected boolean columnSizeApplicable(final TableColumnMetaData column) {
     final int type = column.getType();
     return type != Types.TIMESTAMP
         && type != Types.FLOAT

@@ -1,14 +1,14 @@
 package openag.db.meta;
 
-
 import openag.db.ThreeState;
 
-/**
- * Database single table column metadata container
- *
- * @author Andrei Maus
- */
-public class ColumnMetaData {
+public abstract class ColumnMetaData {
+
+  /* column name */
+  private String name;
+
+  /* table name */
+  private String tableName;
 
   /* table catalog (may be null) */
   private String catalog;
@@ -16,11 +16,11 @@ public class ColumnMetaData {
   /* table schema (may be null) */
   private String schema;
 
-  /* table name */
-  private String tableName;
+  /* column size */
+  private int size;
 
-  /* column name */
-  private String name;
+  /* the number of fractional digits. 0 is returned for data types where it is not applicable. */
+  private int decimals;
 
   /* SQL type from java.sql.Types */
   private int type;
@@ -28,27 +28,8 @@ public class ColumnMetaData {
   /* Data source dependent type name, for a UDT the type name is fully qualified */
   private String typeName;
 
-  /* column size */
-  private int size;
-
-  /* the number of fractional digits. 0 is returned for data types where it is not applicable. */
-  private int decimals;
-
-  /* comment describing column (may be null) */
-  private String comment;
-
-  /* default value for the column (may be null) */
-  private String defaultValue;
-
-  /* for char types the maximum number of bytes in the column */
-  private int charSize;
-
-  /* index of column in table (starting at 1) */
-  private int ordinal;
-
-  private ThreeState nullable;
-
   private ThreeState autoincrement;
+  private ThreeState nullable;
 
   public ColumnMetaData() {
   }
@@ -62,12 +43,12 @@ public class ColumnMetaData {
     this.typeName = copy.typeName;
     this.size = copy.size;
     this.decimals = copy.decimals;
-    this.comment = copy.comment;
-    this.defaultValue = copy.defaultValue;
-    this.charSize = copy.charSize;
-    this.ordinal = copy.ordinal;
     this.nullable = copy.nullable;
     this.autoincrement = copy.autoincrement;
+  }
+
+  public ThreeState getAutoincrement() {
+    return autoincrement;
   }
 
   public String getCatalog() {
@@ -102,28 +83,8 @@ public class ColumnMetaData {
     return decimals;
   }
 
-  public String getComment() {
-    return comment;
-  }
-
-  public String getDefaultValue() {
-    return defaultValue;
-  }
-
-  public int getCharSize() {
-    return charSize;
-  }
-
-  public int getOrdinal() {
-    return ordinal;
-  }
-
   public ThreeState getNullable() {
     return nullable;
-  }
-
-  public ThreeState getAutoincrement() {
-    return autoincrement;
   }
 
   public void setCatalog(final String catalog) {
@@ -158,22 +119,6 @@ public class ColumnMetaData {
     this.decimals = decimals;
   }
 
-  public void setComment(final String comment) {
-    this.comment = comment;
-  }
-
-  public void setDefaultValue(final String defaultValue) {
-    this.defaultValue = defaultValue;
-  }
-
-  public void setCharSize(final int charSize) {
-    this.charSize = charSize;
-  }
-
-  public void setOrdinal(final int ordinal) {
-    this.ordinal = ordinal;
-  }
-
   public void setNullable(final ThreeState nullable) {
     this.nullable = nullable;
   }
@@ -185,20 +130,16 @@ public class ColumnMetaData {
   @Override
   public String toString() {
     return "ColumnMetaData{" +
-        "catalog='" + catalog + '\'' +
+        "name='" + name + '\'' +
+        ", tableName='" + tableName + '\'' +
+        ", catalog='" + catalog + '\'' +
         ", schema='" + schema + '\'' +
-        ", table='" + tableName + '\'' +
-        ", name='" + name + '\'' +
-        ", type=" + type +
-        ", typeName='" + typeName + '\'' +
         ", size=" + size +
         ", decimals=" + decimals +
-        ", comment='" + comment + '\'' +
-        ", defaultValue='" + defaultValue + '\'' +
-        ", charSize=" + charSize +
-        ", ordinal=" + ordinal +
-        ", nullable=" + nullable +
+        ", type=" + type +
+        ", typeName='" + typeName + '\'' +
         ", autoincrement=" + autoincrement +
+        ", nullable=" + nullable +
         '}';
   }
 }

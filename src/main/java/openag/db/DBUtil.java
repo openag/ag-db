@@ -166,18 +166,18 @@ public class DBUtil {
   /**
    * Returns column metadata for the specified table
    */
-  public static List<ColumnMetaData> getColumns(Connection connection,
-                                                String catalog,
-                                                String schemaPattern,
-                                                String tableNamePattern,
-                                                String columnNamePattern) throws SQLException {
+  public static List<TableColumnMetaData> getColumns(Connection connection,
+                                                     String catalog,
+                                                     String schemaPattern,
+                                                     String tableNamePattern,
+                                                     String columnNamePattern) throws SQLException {
     ResultSet rs = null;
 
-    final List<ColumnMetaData> result = new LinkedList<>();
+    final List<TableColumnMetaData> result = new LinkedList<>();
     try {
       rs = connection.getMetaData().getColumns(catalog, schemaPattern, tableNamePattern, columnNamePattern);
       while (rs.next()) {
-        final ColumnMetaData c = new ColumnMetaData();
+        final TableColumnMetaData c = new TableColumnMetaData();
         c.setCatalog(rs.getString("TABLE_CAT"));
         c.setSchema(rs.getString("TABLE_SCHEM"));
         c.setTableName(rs.getString("TABLE_NAME"));

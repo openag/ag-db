@@ -1,6 +1,6 @@
 package openag.db;
 
-import openag.db.meta.ColumnMetaData;
+import openag.db.meta.TableColumnMetaData;
 import openag.db.meta.TypeMetaData;
 import openag.db.meta.TableMetaData;
 import openag.db.meta.TableType;
@@ -44,11 +44,11 @@ public class DBAccess {
     return DBUtil.getTables(connection(), catalog, schema, null, TableType.TABLE);
   }
 
-  public List<ColumnMetaData> getColumns(String tableName) throws SQLException {
+  public List<TableColumnMetaData> getColumns(String tableName) throws SQLException {
     return DBUtil.getColumns(connection(), catalog, schema, tableName, null);
   }
 
-  void createTable(String name, List<ColumnMetaData> columns) throws SQLException {
+  void createTable(String name, List<TableColumnMetaData> columns) throws SQLException {
     final Connection connection = connection();
 
     final StringBuilder query = new StringBuilder("create table ");
@@ -59,7 +59,7 @@ public class DBAccess {
 
     query.append(name).append(" (");
 
-    for (ColumnMetaData column : columns) {
+    for (TableColumnMetaData column : columns) {
       query.append(column.getName()).append(" ").append(toLocalDataType(column));
       if (column.getSize() > 0 && columnSizeApplicable(column)) {
         query.append("(").append(column.getSize());
@@ -97,7 +97,7 @@ public class DBAccess {
     statement.execute();
   }
 
-  private String toLocalDataType(final ColumnMetaData column) {
+  private String toLocalDataType(final TableColumnMetaData column) {
     final Optional<TypeMetaData> nameMatch = this.types.stream()
         .filter(dbType -> dbType.getName().equalsIgnoreCase(column.getTypeName())).findFirst();
 
@@ -115,7 +115,7 @@ public class DBAccess {
     throw new IllegalStateException("Unable to find matching SQL type for column type: " + column.getTypeName());
   }
 
-  private boolean columnSizeApplicable(final ColumnMetaData column) {
+  private boolean columnSizeApplicable(final TableColumnMetaData column) {
     final int type = column.getType();
     return type != Types.TIMESTAMP
         && type != Types.FLOAT

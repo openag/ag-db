@@ -1,6 +1,6 @@
 package openag.db;
 
-import openag.db.meta.ColumnMetaData;
+import openag.db.meta.TableColumnMetaData;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -35,7 +35,7 @@ public class PrimaryKey {
   }
 
   public List<String> getColumnNames() {
-    return columns.stream().map(ColumnMetaData::getName).collect(Collectors.toList());
+    return columns.stream().map(TableColumnMetaData::getName).collect(Collectors.toList());
   }
 
   void setName(final String name) {

@@ -1,11 +1,11 @@
 package openag.db;
 
-import openag.db.meta.ColumnMetaData;
+import openag.db.meta.TableColumnMetaData;
 
 /**
  * Database Column model
  */
-public class Column extends ColumnMetaData {
+public class Column extends TableColumnMetaData {
 
   /**
    * Column owning table
@@ -15,7 +15,7 @@ public class Column extends ColumnMetaData {
   public Column() {
   }
 
-  public Column(final ColumnMetaData metaData) {
+  public Column(final TableColumnMetaData metaData) {
     super(metaData);
   }
 
