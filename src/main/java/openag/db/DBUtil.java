@@ -25,13 +25,33 @@ public class DBUtil {
     assertNotNull(connection);
 
     final String name = connection.getMetaData().getDatabaseProductName();
-    if ("HSQL Database Engine".equals(name)) {
+    if ("HSQL Database Engine".equalsIgnoreCase(name)) {
       return DatabaseType.HSQLDB;
     }
-    if ("Oracle".equals(name)) {
+    if ("Oracle".equalsIgnoreCase(name)) {
       return DatabaseType.ORACLE;
     }
-    //todo: add other databases
+    if ("H2".equalsIgnoreCase(name)) {
+      return DatabaseType.H2;
+    }
+    if ("PostgreSQL".equalsIgnoreCase(name)) {
+      return DatabaseType.POSTGRESQL;
+    }
+    if ("MySQL".equalsIgnoreCase(name)) {
+      return DatabaseType.MYSQL;
+    }
+    if ("Microsoft SQL Server".equalsIgnoreCase(name) ||
+        "SQLOLEDB".equalsIgnoreCase(name)) {
+      return DatabaseType.MSSQL;
+    }
+    if ("Adaptive Server Enterprise".equals(name) ||
+        "Sybase SQL Server".equals(name) ||
+        "sql server".equals(name) ||
+        "ASE".equals(name)) {
+      return DatabaseType.SYBASE;
+    }
+
+    //todo: add DB2
     return DatabaseType.UNKNOWN;
   }
 

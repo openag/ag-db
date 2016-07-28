@@ -17,5 +17,9 @@ public enum DatabaseType {
 
   MYSQL,
 
+  MSSQL,
+
+  SYBASE,
+
   UNKNOWN
 }

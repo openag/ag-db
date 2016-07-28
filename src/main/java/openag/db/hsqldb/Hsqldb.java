@@ -2,6 +2,7 @@ package openag.db.hsqldb;
 
 import org.hsqldb.util.DatabaseManagerSwing;
 
+import java.awt.*;
 import java.lang.reflect.Field;
 
 /**
@@ -27,6 +28,7 @@ public class Hsqldb {
    * @param dbName in-memory database name to connect
    */
   public static void startManager(String dbName) {
+    checkHeadless();
     new ManagerStart(mem(dbName)).run();
   }
 
@@ -37,9 +39,17 @@ public class Hsqldb {
    * @param dbName in-memory database name to connect
    */
   public static void startManagerAsync(String dbName) {
+    checkHeadless();
     final Thread thread = new Thread(new ManagerStart(mem(dbName)));
     thread.setDaemon(true);
     thread.start();
+  }
+
+  private static void checkHeadless() {
+    if (GraphicsEnvironment.isHeadless()) {
+      throw new RuntimeException("You're running java in headless mode. Set startup flag '-Djava.awt.headless=false' " +
+          "in order to disable it. For more information check http://www.oracle.com/technetwork/articles/javase/headless-136834.html");
+    }
   }
 
   /**
